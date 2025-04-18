@@ -1,6 +1,6 @@
 {
   "name": "webpage-to-pdf",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "scripts": {
     "start": "node api/convert.js"
   },
@@ -8,7 +8,7 @@
     "express": "4.18.2",
     "cors": "2.8.5",
     "puppeteer-core": "21.9.0",
-    "@sparticuz/chromium": "120.0.2"
+    "@sparticuz/chromium": "^110.0.1"
   },
   "engines": {
     "node": "18.x"
