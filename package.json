@@ -1,21 +1,15 @@
 {
   "name": "webpage-to-pdf",
-  "version": "4.0.0",
+  "version": "6.0.0",
   "scripts": {
     "start": "node api/convert.js"
   },
   "dependencies": {
     "express": "4.18.2",
-    "cors": "2.8.5",
-    "puppeteer-core": "21.9.0",
-    "@sparticuz/chromium": "^110.0.1"
+    "got": "12.6.0",
+    "html-pdf": "3.0.1"
   },
   "engines": {
     "node": "18.x"
   }
-  "scripts": {
-  "start": "node api/convert.js",
-  "cron": "curl -s https://your-app.vercel.app/api/health > /dev/null"
-   }
 }
-
