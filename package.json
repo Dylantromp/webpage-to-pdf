@@ -1,15 +1,15 @@
 {
   "name": "webpage-to-pdf",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "API to convert webpages to PDF",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node api/convert.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "puppeteer": "^22.8.2",
+    "puppeteer-core": "^22.8.2",
     "cors": "^2.8.5",
     "@sparticuz/chromium": "^120.0.2"
   },
