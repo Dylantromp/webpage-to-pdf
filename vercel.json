@@ -3,19 +3,16 @@
   "builds": [
     {
       "src": "api/convert.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": { 
+        "maxDuration": 30
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/convert",
-      "methods": ["GET"],
       "dest": "api/convert.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "api/convert.js",
-      "status": 404
     }
   ]
 }
