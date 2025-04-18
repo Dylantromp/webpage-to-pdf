@@ -1,13 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const chromium = require('@sparticuz/chromium-min');
+const chromium = require('@sparticuz/chromium');
 const puppeteer = require('puppeteer-core');
 
 const app = express();
 app.use(cors());
-
-// Chromium options for Vercel
-chromium.setGraphicsMode = false;
 
 app.get('/api/convert', async (req, res) => {
   let browser;
@@ -17,10 +14,11 @@ app.get('/api/convert', async (req, res) => {
       return res.status(400).json({ error: 'URL parameter is required' });
     }
 
+    // Launch Puppeteer with Chromium
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [...chromium.args, '--disable-gpu', '--disable-dev-shm-usage'],
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: 'new',
       ignoreHTTPSErrors: true,
     });
 
@@ -42,7 +40,6 @@ app.get('/api/convert', async (req, res) => {
     });
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=converted.pdf');
     res.send(pdf);
 
   } catch (error) {
