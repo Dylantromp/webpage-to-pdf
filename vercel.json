@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "api/convert.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node@2"
     }
   ],
   "routes": [
