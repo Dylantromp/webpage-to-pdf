@@ -1,57 +1,32 @@
 const express = require('express');
-const cors = require('cors');
-const chromium = require('@sparticuz/chromium');
 const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 
 const app = express();
-app.use(cors());
 
 app.get('/api/convert', async (req, res) => {
   let browser;
   try {
     const url = req.query.url;
-    if (!url) {
-      return res.status(400).json({ error: 'URL parameter is required' });
-    }
+    if (!url) return res.status(400).json({ error: 'URL required' });
 
-    // Launch Puppeteer with Chromium
     browser = await puppeteer.launch({
-      args: [...chromium.args, '--disable-gpu', '--disable-dev-shm-usage'],
+      args: [...chromium.args, '--no-sandbox'],
       executablePath: await chromium.executablePath(),
-      headless: 'new',
-      ignoreHTTPSErrors: true,
+      headless: 'new'
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { 
-      waitUntil: 'networkidle2',
-      timeout: 30000 
-    });
-
-    const pdf = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px'
-      }
-    });
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.send(pdf);
-
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+    
+    const pdf = await page.pdf({ format: 'A4' });
+    res.type('application/pdf').send(pdf);
+    
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate PDF',
-      details: error.message 
-    });
+    console.error(error);
+    res.status(500).json({ error: error.message });
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 });
 
