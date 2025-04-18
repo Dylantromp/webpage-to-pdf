@@ -2,37 +2,33 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
 
+// For Vercel deployments
+const chromium = require('@sparticuz/chromium');
+
 const app = express();
 app.use(cors());
 
-// Middleware to validate URL
-const validateUrl = (req, res, next) => {
-  const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'URL parameter is required' });
-  }
-  
-  try {
-    new URL(url);
-    next();
-  } catch (e) {
-    return res.status(400).json({ error: 'Invalid URL format' });
-  }
+// Configure Puppeteer for Vercel
+const getBrowser = () => {
+  return puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
+  });
 };
 
-app.get('/api/convert', validateUrl, async (req, res) => {
+app.get('/api/convert', async (req, res) => {
   try {
     const url = req.query.url;
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage'
-      ]
-    });
-    
+    if (!url) {
+      return res.status(400).json({ error: 'URL parameter is required' });
+    }
+
+    const browser = await getBrowser();
     const page = await browser.newPage();
+    
     await page.goto(url, { 
       waitUntil: 'networkidle2',
       timeout: 30000 
@@ -61,11 +57,6 @@ app.get('/api/convert', validateUrl, async (req, res) => {
       details: error.message 
     });
   }
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'healthy' });
 });
 
 module.exports = app;
