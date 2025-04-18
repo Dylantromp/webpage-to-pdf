@@ -1,22 +1,17 @@
+const { chromium } = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
 const express = require('express');
-const puppeteer = require('puppeteer');
 const cors = require('cors');
-
-// For Vercel deployments
-const chromium = require('@sparticuz/chromium');
 
 const app = express();
 app.use(cors());
 
-// Configure Puppeteer for Vercel
-const getBrowser = () => {
-  return puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    ignoreHTTPSErrors: true,
-  });
+// Configuration for Vercel
+const launchOptions = {
+  args: chromium.args,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
+  ignoreHTTPSErrors: true,
 };
 
 app.get('/api/convert', async (req, res) => {
@@ -26,7 +21,7 @@ app.get('/api/convert', async (req, res) => {
       return res.status(400).json({ error: 'URL parameter is required' });
     }
 
-    const browser = await getBrowser();
+    const browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
     
     await page.goto(url, { 
