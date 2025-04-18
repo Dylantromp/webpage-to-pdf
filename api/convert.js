@@ -34,5 +34,8 @@ app.get('/api/convert', async (req, res) => {
     if (browser) await browser.close();
   }
 });
-
+// Add this before module.exports
+app.get('/', (req, res) => {
+  res.send('PDF API is running! Try /api/convert?url=[your-url]');
+});
 module.exports = app;
