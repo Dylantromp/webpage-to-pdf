@@ -14,3 +14,7 @@
     "node": "18.x"
   }
 }
+"scripts": {
+  "start": "node api/convert.js",
+  "cron": "curl -s https://your-app.vercel.app/api/health > /dev/null"
+}
