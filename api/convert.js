@@ -1,8 +1,12 @@
 const express = require('express');
 const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
+const chromium = require('@sparticuz/chromium'); 
 
 const app = express();
+
+// Configure Chromium
+chromium.setHeadlessMode = true;
+chromium.setGraphicsMode = false;
 
 app.get('/api/convert', async (req, res) => {
   let browser;
@@ -11,9 +15,10 @@ app.get('/api/convert', async (req, res) => {
     if (!url) return res.status(400).json({ error: 'URL required' });
 
     browser = await puppeteer.launch({
-      args: [...chromium.args, '--no-sandbox'],
+      args: chromium.args,
       executablePath: await chromium.executablePath(),
-      headless: 'new'
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
