@@ -38,4 +38,17 @@ app.get('/api/convert', async (req, res) => {
 app.get('/', (req, res) => {
   res.send('PDF API is running! Try /api/convert?url=[your-url]');
 });
+
+// Add timeout handling
+await page.goto(url, {
+  waitUntil: 'domcontentloaded', // Faster than 'networkidle2'
+  timeout: 8000 // Fail fast if page won't load
+});
+
+// Simplify PDF generation
+const pdf = await page.pdf({
+  format: 'A4',
+  printBackground: true,
+  margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' }
+});
 module.exports = app;
