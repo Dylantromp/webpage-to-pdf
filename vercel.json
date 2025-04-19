@@ -3,10 +3,9 @@
   "builds": [{
     "src": "api/convert.js",
     "use": "@vercel/node",
-    "config": { "maxDuration": 30 }
-  }],
-  "routes": [{
-    "src": "/api/(.*)",
-    "dest": "api/convert.js"
+    "config": { 
+      "maxDuration": 30,
+      "includeFiles": ["node_modules/phantomjs-prebuilt/**"]
+    }
   }]
 }
