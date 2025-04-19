@@ -10,6 +10,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.get('/api/convert', async (req, res) => {
+  res.json({ message: 'PDF endpoint coming soon' });
+});
 // Fallback route
 app.use((req, res) => {
   res.status(404).json({
