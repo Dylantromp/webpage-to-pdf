@@ -1,11 +1,22 @@
 {
   "version": 2,
-  "builds": [{
-    "src": "api/convert.js",
-    "use": "@vercel/node"
-  }],
-  "routes": [{
-    "src": "/api/(.*)",
-    "dest": "/api/convert"
-  }]
+  "builds": [
+    {
+      "src": "api/convert.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 30
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/convert.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "api/convert.js"
+    }
+  ]
 }
