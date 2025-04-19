@@ -3,11 +3,7 @@
   "builds": [
     {
       "src": "api/convert.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxDuration": 30,
-        "includeFiles": ["node_modules/@sparticuz/chromium-min/**"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
