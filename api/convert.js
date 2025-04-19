@@ -9,6 +9,7 @@ app.use(cors());
 // Configure Chromium for Vercel
 chromium.setHeadlessMode = true;
 chromium.setGraphicsMode = false;
+args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox']
 
 app.get('/api/convert', async (req, res) => {
   let browser;
