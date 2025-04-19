@@ -5,19 +5,14 @@
       "src": "api/convert.js",
       "use": "@vercel/node",
       "config": {
-        "maxDuration": 30,
-        "includeFiles": ["node_modules/**"]
+        "maxDuration": 30
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/convert.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "api/convert.js"
+      "dest": "/api/convert"
     }
   ]
 }
