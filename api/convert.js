@@ -1,115 +1,55 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
-const got = require('got');
 
 const app = express();
 
-// Middleware
+// Enable CORS
 app.use((req, res, next) => {
-  console.log(`Incoming request: ${req.method} ${req.url}`);
   res.header('Access-Control-Allow-Origin', '*');
   next();
 });
 
-// Health Check (Simplest Possible)
+// Health endpoint
 app.get('/api/health', (req, res) => {
-  console.log('Health check triggered');
-  try {
-    res.json({ 
-      status: 'healthy',
-      timestamp: new Date(),
-      memoryUsage: process.memoryUsage()
-    });
-  } catch (err) {
-    console.error('Health check failed:', err);
-    res.status(500).json({ error: 'Health check failed', details: err.message });
-  }
+  res.json({ status: 'ok', pdfEndpoint: '/api/convert?url=https://example.com' });
 });
 
-// PDF Generation with Step-by-Step Error Handling
+// PDF conversion with minimal dependencies
 app.get('/api/convert', async (req, res) => {
-  const startTime = Date.now();
+  const url = req.query.url;
+  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+
   let browser;
-  let errorStep = 'initialization';
-
   try {
-    // 1. Validate Input
-    errorStep = 'input validation';
-    const url = req.query.url;
-    if (!url) {
-      return res.status(400).json({ error: 'URL parameter is required' });
-    }
-    console.log(`Processing URL: ${url}`);
-
-    // 2. Fetch HTML
-    errorStep = 'HTML fetch';
-    const htmlResponse = await got(url, {
-      timeout: { request: 8000 },
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      retry: 0
-    });
-    console.log('HTML fetched successfully');
-
-    // 3. Launch Browser
-    errorStep = 'browser launch';
+    // 1. Launch browser with essential args only
     browser = await puppeteer.launch({
       headless: 'new',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--single-process'
-      ],
-      timeout: 10000
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-    console.log('Browser launched');
 
-    // 4. Create Page
-    errorStep = 'page creation';
+    // 2. Create page with basic settings
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(15000);
-
-    // 5. Set Content
-    errorStep = 'content setting';
-    await page.setContent(htmlResponse.body, {
+    await page.goto(url, { 
       waitUntil: 'domcontentloaded',
       timeout: 10000
     });
-    console.log('Content set successfully');
 
-    // 6. Generate PDF
-    errorStep = 'PDF generation';
-    const pdf = await page.pdf({
+    // 3. Generate PDF with minimal options
+    const pdf = await page.pdf({ 
       format: 'A4',
-      printBackground: true,
-      margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' },
-      timeout: 15000
+      printBackground: true
     });
-    console.log(`PDF generated in ${Date.now() - startTime}ms`);
 
-    // 7. Send Response
-    errorStep = 'response sending';
-    res.type('application/pdf')
-       .setHeader('Content-Disposition', 'attachment; filename=converted.pdf')
-       .send(pdf);
+    res.type('application/pdf').send(pdf);
 
   } catch (error) {
-    console.error(`Failed at step: ${errorStep}`, error);
+    console.error('PDF conversion failed:', error.message);
     res.status(500).json({ 
-      error: 'PDF generation failed',
-      failedStep: errorStep,
-      details: error.message,
-      timestamp: new Date()
+      error: 'Conversion failed',
+      details: error.message 
     });
   } finally {
-    if (browser) {
-      try {
-        await browser.close();
-        console.log('Browser closed successfully');
-      } catch (err) {
-        console.error('Error closing browser:', err);
-      }
-    }
+    if (browser) await browser.close();
   }
 });
 
