@@ -1,14 +1,15 @@
 {
   "name": "webpage-to-pdf",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "start": "node api/convert.js"
   },
   "dependencies": {
-    "express": "4.18.2",
-    "puppeteer": "22.8.2"
+    "@sparticuz/chromium-min": "^120.0.1",
+    "puppeteer-core": "^21.9.0",
+    "express": "^4.18.2"
   },
   "engines": {
-    "node": "20.x"
+    "node": "18.x"
   }
 }
