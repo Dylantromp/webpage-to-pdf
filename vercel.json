@@ -3,17 +3,13 @@
   "builds": [
     {
       "src": "api/convert.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxDuration": 30,
-        "suppressBuildLogs": true
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/convert"
+      "dest": "api/convert.js"
     }
   ]
 }
