@@ -1,28 +1,50 @@
 const express = require('express');
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
+const cors = require('cors');
+
 const app = express();
+app.use(cors());
 
-// Enable CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
+// PDF generation endpoint
+app.get('/api/convert', async (req, res) => {
+  let browser;
+  try {
+    const url = req.query.url;
+    if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+
+    // Launch browser
+    browser = await puppeteer.launch({
+      args: [...chromium.args, '--no-sandbox'],
+      executablePath: await chromium.executablePath(),
+      headless: true
+    });
+
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+    
+    // Generate PDF
+    const pdf = await page.pdf({ 
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' }
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=converted.pdf');
+    res.send(pdf);
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to generate PDF', details: error.message });
+  } finally {
+    if (browser) await browser.close();
+  }
 });
 
-// Test endpoint
-app.get('/api/test', (req, res) => {
-  res.json({ status: 'API is working!' });
-});
-
-// PDF conversion endpoint
-app.get('/api/convert', (req, res) => {
-  res.json({ 
-    message: 'PDF endpoint is reachable',
-    usage: 'Add ?url=https://example.com' 
-  });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'healthy' });
 });
 
 module.exports = app;
