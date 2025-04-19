@@ -1,11 +1,19 @@
 {
   "version": 2,
-  "builds": [{
-    "src": "api/convert.js",
-    "use": "@vercel/node",
-    "config": { 
-      "maxDuration": 30,
-      "includeFiles": ["node_modules/phantomjs-prebuilt/**"]
+  "builds": [
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
     }
-  }]
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/api/convert"
+    }
+  ]
 }
