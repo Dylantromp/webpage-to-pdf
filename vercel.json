@@ -12,7 +12,8 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/convert"
+      "dest": "api/convert.js",
+      "methods": ["GET"]
     }
   ]
 }
