@@ -1,47 +1,60 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
+const chromium = require('@sparticuz/chromium-min');
 
 const app = express();
 
-// 1. First verify basic routing works
-app.get('/api/test', (req, res) => {
-  res.json({ message: "API is working!", status: 200 });
+// Enable CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
 });
 
-// 2. Then add PDF endpoint
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    message: 'Add ?url=https://example.com to /api/convert'
+  });
+});
+
+// PDF endpoint
 app.get('/api/convert', async (req, res) => {
+  let browser;
   try {
     const url = req.query.url;
     if (!url) return res.status(400).json({ error: 'URL is required' });
 
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox']
+    // Launch with Chromium
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
-    
-    const pdf = await page.pdf({ format: 'A4' });
+    await page.goto(url, { 
+      waitUntil: 'domcontentloaded',
+      timeout: 10000
+    });
+
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true
+    });
+
     res.type('application/pdf').send(pdf);
 
-    await browser.close();
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ 
+      error: 'Conversion failed',
+      details: error.message 
+    });
+  } finally {
+    if (browser) await browser.close();
   }
 });
 
-// 3. Catch-all route for debugging
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Route not found',
-    workingEndpoints: [
-      '/api/test',
-      '/api/convert?url=https://example.com'
-    ]
-  });
-});
-
-// 4. Vercel requires this export
 module.exports = app;
