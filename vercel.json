@@ -1,23 +1,15 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/convert.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxDuration": 30,
-        "includeFiles": ["node_modules/@sparticuz/chromium/**"]
-      }
+  "builds": [{
+    "src": "api/convert.js",
+    "use": "@vercel/node",
+    "config": { 
+      "maxDuration": 30,
+      "suppressBuildLogs": true 
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/convert"
-    },
-    {
-      "src": "/",
-      "dest": "/api/health"
-    }
-  ]
+  }],
+  "routes": [{
+    "src": "/api/(.*)",
+    "dest": "/api/convert"
+  }]
 }
