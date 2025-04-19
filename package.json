@@ -10,6 +10,6 @@
     "got": "^12.6.0"
   },
   "engines": {
-    "node": "20.x"  // Updated to match Puppeteer requirements
+    "node": "20.x"
   }
 }
