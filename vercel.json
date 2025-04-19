@@ -5,15 +5,15 @@
       "src": "api/convert.js",
       "use": "@vercel/node",
       "config": {
-        "maxDuration": 30
+        "maxDuration": 30,
+        "includeFiles": ["node_modules/@sparticuz/chromium-min/**"]
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/convert.js",
-      "methods": ["GET"]
+      "dest": "/api/convert"
     }
   ]
 }
