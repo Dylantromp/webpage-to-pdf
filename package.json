@@ -1,15 +1,8 @@
 {
-  "name": "webpage-to-pdf",
-  "version": "6.0.0",
-  "scripts": {
-    "start": "node api/convert.js"
-  },
   "dependencies": {
     "express": "4.18.2",
     "got": "12.6.0",
-    "html-pdf": "3.0.1"
-  },
-  "engines": {
-    "node": "18.x"
+    "html-pdf": "3.0.1",
+    "phantomjs-prebuilt": "2.1.16"
   }
 }
