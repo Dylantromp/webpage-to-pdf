@@ -1,14 +1,12 @@
 {
   "name": "webpage-to-pdf",
-  "version": "7.0.0",
+  "version": "1.0.0",
   "scripts": {
-    "start": "node api/convert.js",
-    "test": "curl http://localhost:3000/api/health"
+    "start": "node api/convert.js"
   },
   "dependencies": {
     "express": "4.18.2",
-    "puppeteer": "22.8.2",
-    "got": "12.6.0"
+    "puppeteer": "22.8.2"
   },
   "engines": {
     "node": "20.x"
